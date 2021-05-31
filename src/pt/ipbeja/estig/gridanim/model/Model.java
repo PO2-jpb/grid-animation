@@ -103,9 +103,7 @@ final public class Model {
     public void moveHeroInDirection(Direction direction) {
         System.out.println(direction + " pressed ##################################");
         Position neighborPosition = this.hero.getPos().neighborPosition(direction);
-        if (neighborPosition != null) {
-            this.view.updateMove(this.hero, neighborPosition);
-        }
+        this.view.updateMove(this.hero, neighborPosition);
     }
 
     /**
@@ -121,31 +119,6 @@ final public class Model {
             s.append("\n");
         }
         return s.toString();
-    }
-
-    /**
-     * get piece at given position
-     *
-     * @param position to get piece
-     * @return the piece at position
-     */
-    public int pieceAt(Position position) {
-        return this.board[position.getLine()][position.getCol()];
-    }
-
-    /**
-     * Get all the pieces in a new list
-     *
-     * @return list with all pieces (line order)
-     */
-    public List<Integer> getBoard() {
-        List<Integer> list = new ArrayList<>();
-        for (int line = 0; line < N_LINES; line++) {
-            for (int col = 0; col < N_COLS; col++) {
-                list.add(this.board[line][col]);
-            }
-        }
-        return list;
     }
 
     /**

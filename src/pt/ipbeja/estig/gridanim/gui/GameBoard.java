@@ -35,7 +35,7 @@ public class GameBoard extends Application implements View {
     private Map<Mobile, GameImage> movingImages;
     private static Map<KeyCode, Direction> directionMap = new HashMap<>();
 
-    static { // maps JavaFX code to model code
+    static { // maps JavaFX key code to model direction
         directionMap.put(KeyCode.UP, Direction.UP);
         directionMap.put(KeyCode.DOWN, Direction.DOWN);
         directionMap.put(KeyCode.LEFT, Direction.LEFT);
@@ -50,8 +50,7 @@ public class GameBoard extends Application implements View {
 
         Scene scnMain = this.createScene();
 
-        stage.setTitle("Fifteen Puzzle");
-        this.setAppIcon(stage, ICON_FILE);
+        stage.setTitle("Grid Anim");
         stage.setScene(scnMain);
         stage.setOnCloseRequest((e) -> {
             System.exit(0);
@@ -59,6 +58,9 @@ public class GameBoard extends Application implements View {
         stage.show();
     }
 
+    /**
+     * Creates de model and adds monsters
+     */
     private void createModel() {
         this.model = new Model(this);
         // add monsters
@@ -67,39 +69,41 @@ public class GameBoard extends Application implements View {
         }
     }
 
+    /**
+     * Creates GUI Scene
+     * @return the created scene
+     */
     private Scene createScene() {
-
         VBox vbxMain = new VBox();
 
         this.startButton = new Button("Start");
         this.startButton.setOnAction(e -> {
-            Thread t = this.model.moveMonsters(Long.MAX_VALUE);
+            this.model.moveMonsters(Long.MAX_VALUE);
         });
         Pane gridUI = this.createGridUI();
         vbxMain.getChildren().addAll(this.startButton, gridUI);
 
-        Scene scnMain = new Scene(vbxMain);
-        this.setKeyHandle(scnMain);
+        Scene scene = new Scene(vbxMain);
+        this.setKeyHandle(scene);
 
-        return scnMain;
+        return scene;
     }
 
-    void setKeyHandle(Scene scnMain) {
-        scnMain.setOnKeyPressed((KeyEvent event) -> {
+    /**
+     * Set keyboard handler
+     * @param scene the scene
+     */
+    void setKeyHandle(Scene scene) {
+        scene.setOnKeyPressed((KeyEvent event) -> {
             System.out.println("pressed on view");
             model.moveHeroInDirection(directionMap.get(event.getCode()));
         });
     }
 
-    private void setAppIcon(Stage stage, String filename) {
-        try {
-            Image ico = new Image(filename);
-            stage.getIcons().add(ico);
-        } catch (Exception ex) {
-            System.err.println("Error setting icon");
-        }
-    }
-
+    /**
+     * Create grid of images and monsters in a pane
+     * @return the pane with the images added
+     */
     private Pane createGridUI() {
         this.pane = new Pane();
         for (int line = 0; line < Model.N_LINES; line++) {
@@ -114,13 +118,10 @@ public class GameBoard extends Application implements View {
         return pane;
     }
 
-    private void addHeroImage(Pane pane) {
-        Position pos = this.model.getHero().getPos();
-        this.heroImage = new GameImage("15", pos);
-        this.pane.getChildren().add(this.heroImage); // add to gui
-        this.movingImages.put(this.model.getHero(), this.heroImage);
-    }
-
+    /**
+     * Add monsters to GUI
+     * @param pane the pane to add the monsters into
+     */
     private void addMonsterImages(Pane pane) {
         this.movingImages = new HashMap<>();
         List<Monster> monsters = this.model.getMonsters();
@@ -130,6 +131,17 @@ public class GameBoard extends Application implements View {
             this.pane.getChildren().add(pi); // add to gui
             this.movingImages.put(m, pi); // add to map of moving images
         }
+    }
+
+    /**
+     * Add hero to GUI
+     * @param pane the pane to add the hero into
+     */
+    private void addHeroImage(Pane pane) {
+        Position pos = this.model.getHero().getPos();
+        this.heroImage = new GameImage("15", pos);
+        this.pane.getChildren().add(this.heroImage); // add to gui
+        this.movingImages.put(this.model.getHero(), this.heroImage);
     }
 
     /**
