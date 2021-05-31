@@ -63,15 +63,14 @@ final public class Model {
 
     public Thread moveMonsters(long nMovements) {
         Runnable r = () -> {
-            if (nMovements > 0)
             for (long i = 0; i < nMovements; i++) {
                 int randMonsterPosition = RAND.nextInt(this.monsters.size());
                 Monster randMonster = this.monsters.get(randMonsterPosition);
                 if (!randMonster.isMoving()) {
-                    randMonster.setIsMoving(true);
                     Position beginPos = randMonster.getPos();
                     Direction randomDirection = Direction.values()[RAND.nextInt(Direction.values().length)];
                     if (beginPos.isInsideAfter(randomDirection)) {
+                        randMonster.setIsMoving(true);
                         Position endPos = beginPos.neighborPosition(randomDirection);
                         System.out.println("Going to update " + randMonster);
                         this.view.updateMove(randMonster, endPos);
@@ -92,17 +91,16 @@ final public class Model {
         mobile.moveTo(endPos);
         mobile.setIsMoving(false);
         System.out.println("Updated " + mobile);
-
     }
 
     /**
      * Move hero in specified direction
      *
-     * @param direction
+     * @param direction movement direction
      */
     public void moveHeroInDirection(Direction direction) {
         Position neighborPosition = this.hero.getPos().neighborPosition(direction);
-        if (this.freePosition.contains(neighborPosition))
+        if (neighborPosition != null && this.freePosition.contains(neighborPosition))
             this.hero.moveTo(neighborPosition);
     }
 
