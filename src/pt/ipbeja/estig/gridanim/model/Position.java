@@ -23,7 +23,7 @@ final public class Position
          case DOWN:  return new Position(this.getLine() + 1, this.getCol());
          case LEFT:  return new Position(this.getLine(), this.getCol() - 1);
          case RIGHT: return new Position(this.getLine(), this.getCol() + 1);
-         default: return null;
+         default: assert(false); return null;
       }
    }
 

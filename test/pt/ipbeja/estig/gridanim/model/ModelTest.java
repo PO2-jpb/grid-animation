@@ -1,25 +1,27 @@
-package pt.ipbeja.estig.fifteen.model;
+package pt.ipbeja.estig.gridanim.model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pt.ipbeja.estig.fifteen.gui.View;
+import pt.ipbeja.estig.gridanim.gui.View;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ModelTest {
 
+    private View testView;
+
+    @BeforeEach
+    void setUp() {
+        this.testView = new View() {
+            @Override
+            public void updateMove(Mobile mobile, Position endPos) {
+            }
+        };
+    }
+
     @Test
     void moveHero() {
-        Model model = new Model(new View() {
-            @Override
-            public void notifyView(int[][] board) {
-                // does nothing
-            }
-
-            @Override
-            public void showMonsterPosition(Monster randMonster) {
-                // does nothing
-            }
-        });
+        Model model = new Model(testView);
         Position beginPos = model.getHero().getPos();
         model.moveHeroInDirection(Direction.RIGHT);
         Position expectedPos = new Position(beginPos.getLine(), beginPos.getCol() + 1);
@@ -43,28 +45,18 @@ class ModelTest {
 
     @Test
     void moveMonsters() {
-        Model model = new Model(new View() {
-            @Override
-            public void notifyView(int[][] board) {
-                // does nothing
-            }
-            @Override
-            public void showMonsterPosition(Monster randMonster) {
-                System.out.println(randMonster);
-            }
-        });
+        Model model = new Model(testView);
 
-        for (int i = 0; i < 5; i++) {
-            System.out.println(model.addNewMonster());
+        for (int i = 1; i <= 5; i++) {
+            System.out.println(model.addNewMonster(i + ""));
         }
         System.out.println("------------------------");
 
         Thread t = model.moveMonsters(5);
         try {
-            t.join();
+            t.join(); // current thread waits for thread t to end
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 }
