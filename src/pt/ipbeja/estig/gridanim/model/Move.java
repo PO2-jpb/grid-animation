@@ -1,4 +1,4 @@
-package pt.ipbeja.estig.fifteen.model;
+package pt.ipbeja.estig.gridanim.model;
 
 /**
  * Data for each piece movement Stores initial and final position
@@ -6,7 +6,7 @@ package pt.ipbeja.estig.fifteen.model;
  * @author João Paulo Barros
  * @version 2014/05/18 - 2016/04/03
  */
-public class Move
+final public class Move
 {
 	private final Position begin;
 	private final Position end;

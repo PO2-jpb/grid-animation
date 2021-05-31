@@ -1,4 +1,4 @@
-package pt.ipbeja.estig.fifteen.model;
+package pt.ipbeja.estig.gridanim.model;
 
 public class Hero extends Mobile {
 

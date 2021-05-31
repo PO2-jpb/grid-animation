@@ -1,11 +1,13 @@
-package pt.ipbeja.estig.fifteen.model;
+package pt.ipbeja.estig.gridanim.model;
+
+import java.util.Objects;
 
 /**
  * Positions from 0 to number of lines and columns minus 1
  * @author João Paulo Barros
  * @version 2014/05/18 - 2016/04/03
  */ 
-public class Position
+final public class Position
 {
    private final int line, col;
    
@@ -16,14 +18,13 @@ public class Position
    }
 
    public Position neighborPosition(Direction dir) {
-      Position pos = null;
       switch (dir) {
-         case UP: pos = new Position(this.getLine() - 1, this.getCol()); break;
-         case DOWN: pos = new Position(this.getLine() + 1, this.getCol()); break;
-         case LEFT: pos = new Position(this.getLine(), this.getCol() - 1); break;
-         case RIGHT: pos = new Position(this.getLine(), this.getCol() + 1); break;
+         case UP:    return new Position(this.getLine() - 1, this.getCol());
+         case DOWN:  return new Position(this.getLine() + 1, this.getCol());
+         case LEFT:  return new Position(this.getLine(), this.getCol() - 1);
+         case RIGHT: return new Position(this.getLine(), this.getCol() + 1);
+         default: return null;
       }
-      return pos;
    }
 
    public boolean isInsideAfter(Direction dir) {
@@ -77,40 +78,17 @@ public class Position
              0 <= col && col < Model.N_COLS;
    }
 
-   /* automatically generated in eclipse, 
-    * with Source->Generate hashCode() and equals()
-    * (non-Javadoc)
-    * @see java.lang.Object#hashCode()
-    */
    @Override
-   public int hashCode()
-   {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + col;
-      result = prime * result + line;
-      return result;
+   public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      Position position = (Position) o;
+      return line == position.line &&
+              col == position.col;
    }
 
-   /* automatically generated in eclipse, 
-    * with Source->Generate hashCode() and equals() 
-    * (non-Javadoc)
-    * @see java.lang.Object#equals(java.lang.Object)
-    */
    @Override
-   public boolean equals(Object obj)
-   {
-      if (this == obj)
-         return true;
-      if (obj == null)
-         return false;
-      if (getClass() != obj.getClass())
-         return false;
-      Position other = (Position) obj;
-      if (col != other.col)
-         return false;
-      if (line != other.line)
-         return false;
-      return true;
+   public int hashCode() {
+      return Objects.hash(line, col);
    }
 }

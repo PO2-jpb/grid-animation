@@ -1,15 +1,13 @@
-package pt.ipbeja.estig.fifteen.gui;
+package pt.ipbeja.estig.gridanim.gui;
 
 import java.util.*;
 
-import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -17,7 +15,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import pt.ipbeja.estig.fifteen.model.*;
+import pt.ipbeja.estig.gridanim.model.*;
 
 /**
  * The fifteen main view
@@ -31,12 +29,10 @@ public class GameBoard extends Application implements View {
 
     private Button startButton;
     private Pane pane;
-    private Map<String, GameImage> movingImages;
-
-    private Label timeLabel;
+    private Map<Mobile, GameImage> movingImages;
     private static Map<KeyCode, Direction> directionMap = new HashMap<>();
 
-    static {
+    static { // maps JavaFX code to model code
         directionMap.put(KeyCode.UP, Direction.UP);
         directionMap.put(KeyCode.DOWN, Direction.DOWN);
         directionMap.put(KeyCode.LEFT, Direction.LEFT);
@@ -62,7 +58,8 @@ public class GameBoard extends Application implements View {
 
     private void createModel() {
         this.model = new Model(this);
-        for (int i = 1; i <= 5; i++) {
+        // add monsters
+        for (int i = 1; i <= 10; i++) {
             System.out.println(model.addNewMonster(i + ""));
         }
     }
@@ -73,16 +70,12 @@ public class GameBoard extends Application implements View {
 
         this.startButton = new Button("Start");
         this.startButton.setOnAction(e -> {
-            this.model.startTimer();
-
-            Thread t = this.model.moveMonsters(5000);
+            Thread t = this.model.moveMonsters(Long.MAX_VALUE);
 
         });
-        this.timeLabel = new Label(this.model.getTimerValue() + "");
         Pane gridUI = this.createGridUI();
-        vbxMain.getChildren().addAll(this.startButton, this.timeLabel, gridUI);
+        vbxMain.getChildren().addAll(this.startButton, gridUI);
 
-        this.addMonsters();
 
         Scene scnMain = new Scene(vbxMain);
         this.setKeyHandle(scnMain);
@@ -108,25 +101,25 @@ public class GameBoard extends Application implements View {
                 this.pane.getChildren().add(pi); // add to gui
             }
         }
-        this.addMovingImages(pane);
-        this.addHero(pane);
+        this.addMonsterImages(pane);
+        this.addHeroImage(pane);
         return pane;
     }
 
-    private void addHero(Pane pane) {
+    private void addHeroImage(Pane pane) {
         Position pos = this.model.getHero().getPos();
-        this.heroImage = new GameImage("background100", pos);
+        this.heroImage = new GameImage("15", pos);
         this.pane.getChildren().add(this.heroImage); // add to gui
     }
 
-    private void addMovingImages(Pane pane) {
+    private void addMonsterImages(Pane pane) {
         this.movingImages = new HashMap<>();
         List<Monster> monsters = this.model.getMonsters();
         for (Monster m : monsters) {
             Position pos = m.getPos();
-            GameImage pi = new GameImage("background100", pos);
+            GameImage pi = new GameImage(m.getName(), pos);
             this.pane.getChildren().add(pi); // add to gui
-            this.movingImages.put(m.getName(), pi); // add to grid of moving images
+            this.movingImages.put(m, pi); // add to map of moving images
         }
     }
 
@@ -134,71 +127,38 @@ public class GameBoard extends Application implements View {
         scnMain.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                model.moveHeroInDirection(directionMap.get(event.getCode()));
+                //model.moveHeroInDirection(directionMap.get(event.getCode()));
             }
         });
     }
 
     /**
-     * Updates the pieces content by asking the model
-     */
-    private void addMonsters() {
-        List<Monster> monsters = this.model.getMonsters();
-        for (Monster m : monsters) {
-            Position p = m.getPos();
-            GameImage gi = this.movingImages.get(m.getName());
-            gi.setImage(m.getName());
-            gi.setPositionAndXY(p);
-        }
-    }
-
-    /**
      * Update GUI after movement of Mobile object
-     * @param lastMove
+     * @param mobile object to move
+     * @param endPos position after moving
      */
-    public void updateLayoutAfterMove(String name, Move lastMove) {
-        if (lastMove == null) {
-            return;
-        } else {
-            Platform.runLater(() -> {
-                int beginLine = lastMove.getBegin().getLine();
-                int beginCol = lastMove.getBegin().getCol();
-                int endLine = lastMove.getEnd().getLine();
-                int endCol = lastMove.getEnd().getCol();
-
-                GameImage imageToMove = this.movingImages.get(name);
-                if (imageToMove != null && !imageToMove.isMoving()) {
-                    imageToMove.setIsMoving(true);
-
-                    TranslateTransition tt =
-                            new TranslateTransition(Duration.millis(100), imageToMove);
-                    int dCol = endCol - beginCol;
-                    int dLine = endLine - beginLine;
-
-                    tt.setByX(dCol * GameImage.SIDE_SIZE);
-                    tt.setByY(dLine * GameImage.SIDE_SIZE);
-                    //tt.setCycleCount(Timeline.INDEFINITE);
-                    tt.setOnFinished(e -> {
-                        imageToMove.updatePosition(dCol, dLine);
-                        imageToMove.setIsMoving(false);
-                    });
-                    tt.play();
-                }
-            });
-        }
-    }
-
-
-    @Override
-    public void notifyView(int[][] board) {
+    public void updateMove(Mobile mobile, Position endPos) {
         Platform.runLater(() -> {
-            // to do
-        });
-    }
+            GameImage imageToMove = this.movingImages.get(mobile);
+            if (imageToMove != null) {
+                TranslateTransition tt =
+                        new TranslateTransition(Duration.millis(200), imageToMove);
+                int beginLine = mobile.getPos().getLine();
+                int beginCol = mobile.getPos().getCol();
+                int endLine = endPos.getLine();
+                int endCol = endPos.getCol();
+                int dCol = endCol - beginCol;
+                int dLine = endLine - beginLine;
 
-    @Override
-    public void showMonsterPosition(Monster randMonster) {
-        // to do
+                tt.setByX(dCol * GameImage.SIDE_SIZE);
+                tt.setByY(dLine * GameImage.SIDE_SIZE);
+                tt.setOnFinished(e -> {
+                    imageToMove.updatePosition(dCol, dLine);
+                    model.moveMobile(mobile, endPos); // update the model
+                });
+                tt.play();
+            }
+        });
     }
 
     /**

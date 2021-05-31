@@ -1,8 +1,8 @@
-package pt.ipbeja.estig.fifteen.gui;
+package pt.ipbeja.estig.gridanim.gui;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import pt.ipbeja.estig.fifteen.model.Position;
+import pt.ipbeja.estig.gridanim.model.Position;
 
 /**
  * Square image for game
@@ -14,14 +14,12 @@ import pt.ipbeja.estig.fifteen.model.Position;
 public class GameImage extends ImageView
 {
 	public final static int SIDE_SIZE = 30;
-	private Position position;
+
 	private String imageName;
-	private boolean isMoving;
+	private Position position;
 
 	public GameImage(String imageName, Position position)
 	{
-		this.position = position;
-		this.isMoving = false;
 		this.setImage(imageName);
 		this.setPositionAndXY(position);
 	}
@@ -67,24 +65,10 @@ public class GameImage extends ImageView
 		this.setY(position.getLine() * SIDE_SIZE);
 	}
 
-	public void updatePositionAndXY(int dCol, int dLine) {
-		int col = this.position.getCol() + dCol;
-		int line = this.position.getLine() + dLine;
-		this.setPositionAndXY(new Position(line, col));
-	}
-
 	public void updatePosition(int dCol, int dLine) {
 		int col = this.position.getCol() + dCol;
 		int line = this.position.getLine() + dLine;
 		this.position = new Position(line, col);
-	}
-
-	public boolean isMoving() {
-		return this.isMoving;
-	}
-
-	public void setIsMoving(boolean isMoving) {
-		this.isMoving = isMoving;
 	}
 
 }

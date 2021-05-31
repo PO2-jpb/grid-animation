@@ -1,4 +1,4 @@
-package pt.ipbeja.estig.fifteen.model;
+package pt.ipbeja.estig.gridanim.model;
 
 public class Monster extends Mobile {
 
@@ -9,8 +9,8 @@ public class Monster extends Mobile {
 
     @Override
     public String toString() {
-        return "Monster{" +
+        return "Monster{ " + getName() + ", " +
                 "pos=" + this.getPos() +
-                '}';
+                " }";
     }
 }
