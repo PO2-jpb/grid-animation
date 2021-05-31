@@ -14,5 +14,5 @@ public interface View {
 
     void showMonsterPosition(Monster randMonster);
 
-    void updateLayoutAfterMove(Move lastMove);
+    void updateLayoutAfterMove(String name, Move lastMove);
 }

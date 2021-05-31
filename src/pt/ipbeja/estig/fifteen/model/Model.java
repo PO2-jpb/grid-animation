@@ -74,12 +74,12 @@ public class Model {
                 Monster randMonster = this.monsters.get(randMonsterPosition);
                 Position beginPos = randMonster.getPos();
                 Direction randomDirection = Direction.values()[RAND.nextInt(Direction.values().length)];
-                randMonster.move(randomDirection);
-                Position endPos = randMonster.getPos();
-                if (endPos.isInside()) {
+                if (beginPos.isInsideAfter(randomDirection)) {
+                    randMonster.move(randomDirection);
+                    Position endPos = randMonster.getPos();
                     Move move = new Move(beginPos, endPos);
-                    this.view.updateLayoutAfterMove(move);
-                    Model.sleep(500);
+                    this.view.updateLayoutAfterMove(randMonster.getName(), move);
+                    Model.sleep(100);
                 }
             }
         };

@@ -2,6 +2,7 @@ package pt.ipbeja.estig.fifteen.gui;
 
 import java.util.*;
 
+import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -30,7 +31,7 @@ public class GameBoard extends Application implements View {
 
     private Button startButton;
     private Pane pane;
-    private GameImage[][] gridImages;
+    private Map<String, GameImage> movingImages;
 
     private Label timeLabel;
     private static Map<KeyCode, Direction> directionMap = new HashMap<>();
@@ -41,6 +42,8 @@ public class GameBoard extends Application implements View {
         directionMap.put(KeyCode.LEFT, Direction.LEFT);
         directionMap.put(KeyCode.RIGHT, Direction.RIGHT);
     }
+
+    private GameImage heroImage;
 
     @Override
     public void start(Stage stage) {
@@ -55,9 +58,6 @@ public class GameBoard extends Application implements View {
             System.exit(0);
         });
         stage.show();
-
-
-
     }
 
     private void createModel() {
@@ -72,10 +72,10 @@ public class GameBoard extends Application implements View {
         VBox vbxMain = new VBox();
 
         this.startButton = new Button("Start");
-        this.startButton.setOnAction( e -> {
+        this.startButton.setOnAction(e -> {
             this.model.startTimer();
 
-            Thread t = this.model.moveMonsters(5);
+            Thread t = this.model.moveMonsters(5000);
 
         });
         this.timeLabel = new Label(this.model.getTimerValue() + "");
@@ -100,20 +100,34 @@ public class GameBoard extends Application implements View {
     }
 
     private Pane createGridUI() {
-        int nLines = Model.N_LINES;
-        int nCols = Model.N_COLS;
         this.pane = new Pane();
-        this.gridImages = new GameImage[nLines][nCols];
-
-        for (int line = 0; line < nLines; line++) {
-            for (int col = 0; col < nCols; col++) {
+        for (int line = 0; line < Model.N_LINES; line++) {
+            for (int col = 0; col < Model.N_COLS; col++) {
                 Position pos = new Position(line, col);
                 GameImage pi = new GameImage("background100", pos);
                 this.pane.getChildren().add(pi); // add to gui
-                this.gridImages[line][col] = pi; // add t grid
             }
         }
+        this.addMovingImages(pane);
+        this.addHero(pane);
         return pane;
+    }
+
+    private void addHero(Pane pane) {
+        Position pos = this.model.getHero().getPos();
+        this.heroImage = new GameImage("background100", pos);
+        this.pane.getChildren().add(this.heroImage); // add to gui
+    }
+
+    private void addMovingImages(Pane pane) {
+        this.movingImages = new HashMap<>();
+        List<Monster> monsters = this.model.getMonsters();
+        for (Monster m : monsters) {
+            Position pos = m.getPos();
+            GameImage pi = new GameImage("background100", pos);
+            this.pane.getChildren().add(pi); // add to gui
+            this.movingImages.put(m.getName(), pi); // add to grid of moving images
+        }
     }
 
     void setKeyHandle(Scene scnMain) {
@@ -132,39 +146,44 @@ public class GameBoard extends Application implements View {
         List<Monster> monsters = this.model.getMonsters();
         for (Monster m : monsters) {
             Position p = m.getPos();
-            GameImage gi = this.gridImages[p.getLine()][p.getCol()];
+            GameImage gi = this.movingImages.get(m.getName());
             gi.setImage(m.getName());
             gi.setPositionAndXY(p);
         }
     }
 
-    public void updateLayoutAfterMove(Move lastMove) {
+    /**
+     * Update GUI after movement of Mobile object
+     * @param lastMove
+     */
+    public void updateLayoutAfterMove(String name, Move lastMove) {
         if (lastMove == null) {
             return;
-        }
-        else {
+        } else {
             Platform.runLater(() -> {
                 int beginLine = lastMove.getBegin().getLine();
                 int beginCol = lastMove.getBegin().getCol();
                 int endLine = lastMove.getEnd().getLine();
                 int endCol = lastMove.getEnd().getCol();
 
-                GameImage imageToMove = this.gridImages[beginLine][beginCol];
-                GameImage imageToReplace = this.gridImages[endLine][endCol];
+                GameImage imageToMove = this.movingImages.get(name);
+                if (imageToMove != null && !imageToMove.isMoving()) {
+                    imageToMove.setIsMoving(true);
 
-                TranslateTransition tt =
-                        new TranslateTransition(Duration.millis(500), imageToMove);
-                int dCol = endCol - beginCol;
-                int dLine = endLine - beginLine;
-                tt.setByX(dCol * GameImage.SIDE_SIZE);
-                tt.setByY(dLine * GameImage.SIDE_SIZE);
-                tt.play();
+                    TranslateTransition tt =
+                            new TranslateTransition(Duration.millis(100), imageToMove);
+                    int dCol = endCol - beginCol;
+                    int dLine = endLine - beginLine;
 
-                imageToMove.updatePosition(dCol, dLine);
-                this.gridImages[endLine][endCol] = imageToMove;
-
-                imageToReplace.setPositionAndXY(new Position(beginLine, beginCol));
-                this.gridImages[beginLine][beginCol] = imageToReplace;
+                    tt.setByX(dCol * GameImage.SIDE_SIZE);
+                    tt.setByY(dLine * GameImage.SIDE_SIZE);
+                    //tt.setCycleCount(Timeline.INDEFINITE);
+                    tt.setOnFinished(e -> {
+                        imageToMove.updatePosition(dCol, dLine);
+                        imageToMove.setIsMoving(false);
+                    });
+                    tt.play();
+                }
             });
         }
     }

@@ -16,10 +16,12 @@ public class GameImage extends ImageView
 	public final static int SIDE_SIZE = 30;
 	private Position position;
 	private String imageName;
+	private boolean isMoving;
 
 	public GameImage(String imageName, Position position)
 	{
 		this.position = position;
+		this.isMoving = false;
 		this.setImage(imageName);
 		this.setPositionAndXY(position);
 	}
@@ -76,4 +78,13 @@ public class GameImage extends ImageView
 		int line = this.position.getLine() + dLine;
 		this.position = new Position(line, col);
 	}
+
+	public boolean isMoving() {
+		return this.isMoving;
+	}
+
+	public void setIsMoving(boolean isMoving) {
+		this.isMoving = isMoving;
+	}
+
 }

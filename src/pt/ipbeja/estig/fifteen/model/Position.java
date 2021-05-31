@@ -25,6 +25,11 @@ public class Position
       }
       return pos;
    }
+
+   public boolean isInsideAfter(Direction dir) {
+      Position pos = this.neighborPosition(dir);
+      return pos.isInside();
+   }
    
    /* (non-Javadoc)
     * @see java.lang.Object#toString()
