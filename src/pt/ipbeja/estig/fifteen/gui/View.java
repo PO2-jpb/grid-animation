@@ -13,4 +13,6 @@ public interface View {
     void notifyView(int[][] board);
 
     void showMonsterPosition(Monster randMonster);
+
+    void updateLayoutAfterMove(Move lastMove);
 }

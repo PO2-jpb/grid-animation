@@ -18,6 +18,7 @@ public class Model {
     private int[][] board;
     private Set<Position> freePosition;
     private Hero hero;
+
     private List<Monster> monsters;
 
     private Timer timer;
@@ -30,7 +31,7 @@ public class Model {
      */
     public Model(View view) {
 
-        this.hero = new Hero(new Position(N_LINES / 2, N_COLS / 2));
+        this.hero = new Hero("Hero", new Position(N_LINES / 2, N_COLS / 2));
         this.timer = new Timer();
         this.view = view;
         this.monsters = new ArrayList<>();
@@ -54,22 +55,32 @@ public class Model {
         return this.hero;
     }
 
-    public Monster addNewMonster() {
+    public Monster addNewMonster(String name) {
         Position freePos = this.getRandomFreePos();
-        Monster monster = new Monster(freePos);
+        Monster monster = new Monster(name, freePos);
         this.monsters.add(monster);
         return monster;
     }
+
+    public List<Monster> getMonsters() {
+        return this.monsters;
+    }
+
 
     public Thread moveMonsters(int nMovements) {
         Runnable r = () -> {
             for (int i = 0; i < nMovements; i++) {
                 int randMonsterPosition = RAND.nextInt(this.monsters.size());
                 Monster randMonster = this.monsters.get(randMonsterPosition);
+                Position beginPos = randMonster.getPos();
                 Direction randomDirection = Direction.values()[RAND.nextInt(Direction.values().length)];
                 randMonster.move(randomDirection);
-                this.view.showMonsterPosition(randMonster);
-                Model.sleep(500);
+                Position endPos = randMonster.getPos();
+                if (endPos.isInside()) {
+                    Move move = new Move(beginPos, endPos);
+                    this.view.updateLayoutAfterMove(move);
+                    Model.sleep(500);
+                }
             }
         };
         Thread t = new Thread(r);

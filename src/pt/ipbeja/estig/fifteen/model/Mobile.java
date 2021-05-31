@@ -1,10 +1,17 @@
 package pt.ipbeja.estig.fifteen.model;
 
 public abstract class Mobile {
+
+    private String name;
     private Position pos;
 
-    public Mobile(Position pos) {
+    public Mobile(String name, Position pos) {
+        this.name = name;
         this.pos = pos;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Position getPos() {
