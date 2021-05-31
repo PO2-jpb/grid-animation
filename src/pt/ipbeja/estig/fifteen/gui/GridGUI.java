@@ -26,12 +26,11 @@ import pt.ipbeja.estig.fifteen.model.*;
  * @version 2014/05/19 - 2016/04/03 - 2017/04/19 - 2019/05/06 - 2021/05/18
  */
 public class GridGUI extends Application implements View {
-	private final String ICON_FILE = "/resources/images/puzzle15.jpg";
+	private final String ICON_FILE = "/resources/images/background100.png";
 	private Model model;
 
 	private List<PositionImage> positionImages;
-	private Button solveButton;
-	private GridPane panBtns;
+	private GridPane grid;
 	private Label timeLabel;
 	private static Map<KeyCode, Direction> directionMap = new HashMap<>();
 	static {
@@ -53,24 +52,15 @@ public class GridGUI extends Application implements View {
 	public void start(Stage stage) {
 		this.createModel();
 
-
 		Scene scnMain = this.createScene();
 
 		stage.setTitle("Fifteen Puzzle");
 		this.setAppIcon(stage, ICON_FILE);
 		stage.setScene(scnMain);
+		stage.setOnCloseRequest((e) -> { System.exit(0);});
 		stage.show();
 
 		this.model.startTimer();
-	}
-
-	/**
-	 * Executed on exit to stop all threads
-	 */
-	@Override
-	public void stop() {
-		System.out.println("END");
-		System.exit(0);
 	}
 
 	private void setAppIcon(Stage stage, String filename) {
@@ -82,18 +72,18 @@ public class GridGUI extends Application implements View {
 		}
 	}
 
-	private Pane createButtonsUI() {
+	private Pane createGridUI() {
 		int nRows = Model.N_LINES;
 		int nCols = Model.N_COLS;
-		this.panBtns = new GridPane();
-		this.panBtns.setAlignment(Pos.CENTER);
+		this.grid = new GridPane();
+		this.grid.setAlignment(Pos.CENTER);
 
 		this.positionImages = new ArrayList<>();
 		for (int row = 0; row < nRows; row++) {
 			for (int col = 0; col < nCols; col++) {
 				Position pos = new Position(row, col);
 				PositionImage pi = new PositionImage("background100", pos);
-				this.panBtns.add(pi, col, row);
+				this.grid.add(pi, col, row);
 				this.positionImages.add(pi);
 				//pi.setOnMouseClicked(this::handle);
 
@@ -101,7 +91,7 @@ public class GridGUI extends Application implements View {
 				GridPane.setHgrow(pi, Priority.ALWAYS);
 			}
 		}
-		return panBtns;
+		return grid;
 	}
 
 
@@ -118,8 +108,8 @@ public class GridGUI extends Application implements View {
 		VBox vbxMain = new VBox();
 
 		this.timeLabel = new Label(this.model.getTimerValue() + "");
-		vbxMain.getChildren().addAll(solveButton, this.timeLabel);
-		vbxMain.getChildren().addAll(this.createButtonsUI());
+		vbxMain.getChildren().addAll(this.timeLabel);
+		vbxMain.getChildren().addAll(this.createGridUI());
 		Scene scnMain = new Scene(vbxMain);
 		this.setKeyHandle(scnMain);
 
@@ -139,7 +129,6 @@ public class GridGUI extends Application implements View {
 			//pi.setImage(btnText);
 		}
 		this.timeLabel.setText(this.model.getTimerValue() + "");
-		this.solveButton.setDisable(false);
 	}
 
 	public void updateLayoutAfterMove(Move lastMove) {
@@ -173,14 +162,10 @@ public class GridGUI extends Application implements View {
 
 	/**
 	 * Start program
-	 * 
 	 * @param args
 	 *            currently not used
 	 */
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
-
-
-
 }

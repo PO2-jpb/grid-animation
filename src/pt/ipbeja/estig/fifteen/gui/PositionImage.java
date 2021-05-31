@@ -13,6 +13,7 @@ import pt.ipbeja.estig.fifteen.model.Position;
  */
 public class PositionImage extends ImageView
 {
+	public final static int SIZE = 30;
 	private final Position position;
 	private String imageName;
 
@@ -42,5 +43,7 @@ public class PositionImage extends ImageView
 		String filename = "/resources/images/" + this.imageName + ".png";
 		Image img = new Image(filename);
 		this.setImage(img);
+		this.setFitHeight(PositionImage.SIZE);
+		this.setFitWidth(PositionImage.SIZE);
 	}
 }
