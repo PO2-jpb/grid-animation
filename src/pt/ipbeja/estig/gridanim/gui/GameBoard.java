@@ -1,11 +1,8 @@
 package pt.ipbeja.estig.gridanim.gui;
 
-import java.util.*;
-
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -17,6 +14,10 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import pt.ipbeja.estig.gridanim.model.*;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * The fifteen main view
  *
@@ -24,6 +25,8 @@ import pt.ipbeja.estig.gridanim.model.*;
  * @version 2014/05/19 - 2016/04/03 - 2017/04/19 - 2019/05/06 - 2021/05/18
  */
 public class GameBoard extends Application implements View {
+    private static final double TRANSLATION_TIME_IN_MILLIS = 100;
+
     private final String ICON_FILE = "/resources/images/background100.png";
     private Model model;
 
@@ -71,16 +74,21 @@ public class GameBoard extends Application implements View {
         this.startButton = new Button("Start");
         this.startButton.setOnAction(e -> {
             Thread t = this.model.moveMonsters(Long.MAX_VALUE);
-
         });
         Pane gridUI = this.createGridUI();
         vbxMain.getChildren().addAll(this.startButton, gridUI);
-
 
         Scene scnMain = new Scene(vbxMain);
         this.setKeyHandle(scnMain);
 
         return scnMain;
+    }
+
+    void setKeyHandle(Scene scnMain) {
+        scnMain.setOnKeyPressed((KeyEvent event) -> {
+            System.out.println("pressed on view");
+            model.moveHeroInDirection(directionMap.get(event.getCode()));
+        });
     }
 
     private void setAppIcon(Stage stage, String filename) {
@@ -110,6 +118,7 @@ public class GameBoard extends Application implements View {
         Position pos = this.model.getHero().getPos();
         this.heroImage = new GameImage("15", pos);
         this.pane.getChildren().add(this.heroImage); // add to gui
+        this.movingImages.put(this.model.getHero(), this.heroImage);
     }
 
     private void addMonsterImages(Pane pane) {
@@ -123,17 +132,9 @@ public class GameBoard extends Application implements View {
         }
     }
 
-    void setKeyHandle(Scene scnMain) {
-        scnMain.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                //model.moveHeroInDirection(directionMap.get(event.getCode()));
-            }
-        });
-    }
-
     /**
      * Update GUI after movement of Mobile object
+     *
      * @param mobile object to move
      * @param endPos position after moving
      */
@@ -142,7 +143,7 @@ public class GameBoard extends Application implements View {
             GameImage imageToMove = this.movingImages.get(mobile);
             if (imageToMove != null) {
                 TranslateTransition tt =
-                        new TranslateTransition(Duration.millis(200), imageToMove);
+                        new TranslateTransition(Duration.millis(TRANSLATION_TIME_IN_MILLIS), imageToMove);
                 int beginLine = mobile.getPos().getLine();
                 int beginCol = mobile.getPos().getCol();
                 int endLine = endPos.getLine();

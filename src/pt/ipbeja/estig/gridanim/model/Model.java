@@ -11,12 +11,14 @@ import java.util.*;
  * @version 2021/05/28
  */
 final public class Model {
+    private static final int TIME_IN_MILLS_BETWEEN_MOVES = 5;
+
     public static final int N_LINES = 20;
     public static final int N_COLS = 20;
 
     private final static Random RAND = new Random();
     private int[][] board;
-    private Set<Position> freePosition;
+    private Set<Position> freePositions;
     private Hero hero;
 
     private List<Monster> monsters;
@@ -31,7 +33,7 @@ final public class Model {
         this.hero = new Hero("Hero", new Position(N_LINES / 2, N_COLS / 2));
         this.view = view;
         this.monsters = new ArrayList<>();
-        this.freePosition = new HashSet<>();
+        this.freePositions = new HashSet<>();
         this.resetBoard();
     }
 
@@ -74,7 +76,7 @@ final public class Model {
                         Position endPos = beginPos.neighborPosition(randomDirection);
                         System.out.println("Going to update " + randMonster);
                         this.view.updateMove(randMonster, endPos);
-                        Model.sleep(5);
+                        Model.sleep(TIME_IN_MILLS_BETWEEN_MOVES);
                     }
                 } else {
                     System.out.println(randMonster + " is moving");
@@ -99,9 +101,11 @@ final public class Model {
      * @param direction movement direction
      */
     public void moveHeroInDirection(Direction direction) {
+        System.out.println(direction + " pressed ##################################");
         Position neighborPosition = this.hero.getPos().neighborPosition(direction);
-        if (neighborPosition != null && this.freePosition.contains(neighborPosition))
-            this.hero.moveTo(neighborPosition);
+        if (neighborPosition != null) {
+            this.view.updateMove(this.hero, neighborPosition);
+        }
     }
 
     /**
@@ -150,9 +154,9 @@ final public class Model {
      * @return the random free position
      */
     private Position getRandomFreePos() {
-        Position[] positions = new Position[this.freePosition.size()];
-        this.freePosition.toArray(positions);
-        return positions[RAND.nextInt(this.freePosition.size())];
+        Position[] positions = new Position[this.freePositions.size()];
+        this.freePositions.toArray(positions);
+        return positions[RAND.nextInt(this.freePositions.size())];
     }
 
     /**
@@ -164,7 +168,7 @@ final public class Model {
         for (int line = 0; line < Model.N_LINES; line++) {
             for (int col = 0; col < Model.N_COLS; col++) {
                 this.board[line][col] = pos++;
-                this.freePosition.add(new Position(line, col)); // all are free
+                this.freePositions.add(new Position(line, col)); // all are free
             }
         }
     }
@@ -185,53 +189,3 @@ final public class Model {
     }
 
 }
-
-
-//    /**
-//     * rewinds the puzzle with given moves and applies the reverse of each move
-//     *
-//     * @param sleepTime time between each move
-//     */
-//    public void unmix(int sleepTime) {
-//        Runnable task = () -> {
-//            Move m;
-//            while ((m = moves.poll()) != null) {
-//                Move mr = m.getReversed();
-//                (/applyMove(mr);
-//                FifteenModel.sleep(sleepTime);
-//                boolean winning = inWinningPositions();
-//
-//                notifyViews(mr, winning, timerValue);
-//
-//                if (winning) {
-//                    moves.clear();
-//                    break;
-//                }
-//            }
-//        };
-//        Thread threadToUnmix = new Thread(task);
-//        threadToUnmix.start();
-//    }
-
-
-//    /**
-//     * Tries to move a piece at position If moved notifies views
-//     *
-//     * @param position position of piece to move
-//     */
-//    private void movePieceAt(Position position) {
-//        if (position.isInside()) {
-//            Position emptyPos = this.getEmptyInNeighborhood(position);
-//            if (emptyPos != null) {
-//                Move newMove = new Move(position, emptyPos);
-//                this.applyMove(newMove);
-//                this.moves.addFirst(newMove); // add at head (begin) of deque
-//                boolean winning = inWinningPositions();
-//                this.notifyViews(newMove, winning, timerValue);
-//                if (winning) {
-//                    timerValue = 0;
-//                    timer.cancel();
-//                }
-//            }
-//        }
-//    }
