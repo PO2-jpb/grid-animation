@@ -5,10 +5,10 @@ import pt.ipbeja.estig.gridanim.gui.View;
 import java.util.*;
 
 /**
- * board model
+ * Grid anim model
  *
  * @author João Paulo Barros
- * @version 2021/05/28
+ * @version 2021/05/31
  */
 final public class Model {
     private static final int TIME_IN_MILLS_BETWEEN_MOVES = 5;

@@ -2,6 +2,12 @@ package pt.ipbeja.estig.gridanim.model;
 
 import java.util.Objects;
 
+/**
+ * Mobile objects
+ *
+ * @author João Paulo Barros
+ * @version 2021/05/31
+ */
 public abstract class Mobile {
 
     private String name;

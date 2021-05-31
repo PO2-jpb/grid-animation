@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The fifteen main view
+ * The anim main view
  *
- * @author João Paulo Barros e Rui Pais
- * @version 2014/05/19 - 2016/04/03 - 2017/04/19 - 2019/05/06 - 2021/05/18
+ * @author João Paulo Barros
+ * @version 2021/05/31
  */
 public class GameBoard extends Application implements View {
     private static final double TRANSLATION_TIME_IN_MILLIS = 100;

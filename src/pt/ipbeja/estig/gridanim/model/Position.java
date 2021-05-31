@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Positions from 0 to number of lines and columns minus 1
  * @author João Paulo Barros
- * @version 2014/05/18 - 2016/04/03
+ * @version 2021/05/31
  */ 
 final public class Position
 {
